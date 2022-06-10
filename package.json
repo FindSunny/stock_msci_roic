@@ -1,0 +1,27 @@
+{
+  "name": "stock_msci_roic",
+  "version": "1.0.0",
+  "description": "ROIC based on MSCI index",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FindSunny/stock_msci_roic.git"
+  },
+  "keywords": [
+    "stock",
+    "msci",
+    "roic"
+  ],
+  "author": "FindFly",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FindSunny/stock_msci_roic/issues"
+  },
+  "homepage": "https://github.com/FindSunny/stock_msci_roic#readme",
+  "dependencies": {
+    "@hapi/hapi": "^20.2.2"
+  }
+}

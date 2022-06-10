@@ -8,24 +8,41 @@
 
 const Hapi = require('@hapi/hapi');
 
+const { readNSaveExcelFile } = require('./utils/ExcelUtils');
+const StockUtils = require('./utils/StockUtils');
+
 const init = async () => {
 
-    const server = Hapi.server({
-        port: 3000,
-        host: 'localhost'
-    });
+    /**
+     * 异步读取Excel文件
+     */
+    const stockList = await readNSaveExcelFile();
 
-    server.route({
-        method: 'GET',
-        path: '/',
-        handler: (request, h) => {
+    if (!stockList || stockList.length === 0) {
+        console.log('readNSaveExcelFile is out of control!!!!');
+        return;
+    }
 
-            return 'Hello World!';
-        }
-    });
+    /**
+     * 将股票列表，插入数据库
+     */
+    await StockUtils.insertStockList(stockList);
 
-    await server.start();
-    console.log('Server running on %s', server.info.uri);
+    /**
+     * 批量获取MSCI股票数据，
+     */
+    // await StockUtils.fetchStockData();
+
+    /**
+     * 计算MSCI股票ROIC数据
+     */
+    // await StockUtils.calculateStockROIC();
+
+    /**
+     * 导出MSCI股票ROIC数据
+     */
+    // await ExcelUtils.exportStockROIC();
+
 };
 
 process.on('unhandledRejection', (err) => {

@@ -33,7 +33,7 @@ https://app.xunjiepdf.com/ocrpdf/
 ### 同花顺下载
 http://www.iwencai.com/stockpick/search?typed=1&preParams=&ts=1&f=1&qs=result_original&selfsectsn=&querytype=stock&searchfilter=&tid=stockpick&w=MSCI
 
-### 巨潮API地址
+## 巨潮API地址
 http://webapi.cninfo.com.cn/#/apiDoc
 
 ### 巨潮API - header中，mcCode获取

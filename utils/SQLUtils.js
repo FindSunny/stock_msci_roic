@@ -17,6 +17,7 @@ const SQLUtils = {
             port: 3306,
             connectionLimit: 10,
             multipleStatements: true,
+            connectTimeout: 120000
         };
     },
 

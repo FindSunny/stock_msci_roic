@@ -2,6 +2,7 @@
 'use strict';
 
 const XLXS = require('xlsx');
+const SQLUtils = require('./SQLUtils.js');
 
 const ExcelUtils = {
 
@@ -75,7 +76,44 @@ const ExcelUtils = {
             stockList: stockList,
             season: sheet['A2'].v
         };
+    },
+
+    /**
+     * 导出MSCI China Index股票ROIC数据
+     * @param {String} season 季度
+     * @returns
+     */
+    exportStockROIC: async (season) => {
+
+        console.log('导出MSCI China Index股票ROIC数据中...');
+        // 查询股票ROIC数据
+        let sql = `
+            SELECT stock_code, stock_name, season, median_roic, var_roic
+            FROM stock
+            WHERE season = ?`;
+        let params = [season];
+        let results = await SQLUtils.execute(sql, params);
+
+        // 新建Excel文件
+        let workbook = XLXS.utils.book_new();
+        // 写入工作表
+        let ws_data = [];
+        ws_data.push(['证券简称', '证券代码', 'ROIC中位数', 'ROIC方差']);
+        results.forEach(result => {
+            ws_data.push([result.stock_name, result.stock_code, result.median_roic, result.var_roic]);
+        });
+        let ws = XLXS.utils.aoa_to_sheet(ws_data);
+        // 创建工作簿
+        XLXS.utils.book_append_sheet(workbook, ws, 'MSCI China Index ROIC');
+
+        // 导出Excel文件
+        let fileName = 'MSCI China Index ROIC ' + season + '_' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate() + 'byQ.xlsx';
+        XLXS.writeFile(workbook, './output/' + fileName);
+
+        console.log('MSCI China Index ROIC数据导出成功！');
+
     }
+
 }
 
 module.exports = ExcelUtils;

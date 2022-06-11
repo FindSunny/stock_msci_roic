@@ -10,6 +10,7 @@ const Hapi = require('@hapi/hapi');
 
 const { readNSaveExcelFile } = require('./utils/ExcelUtils');
 const StockUtils = require('./utils/StockUtils');
+const ExcelUtils = require('./utils/ExcelUtils');
 
 const init = async () => {
 
@@ -42,11 +43,16 @@ const init = async () => {
      * 计算MSCI股票ROIC数据
      */
     await StockUtils.calculateStockROIC(stockInfo.stockList, stockInfo.season);
+    
+    /**
+     * 分析MSCI股票ROIC数据
+     */
+    await StockUtils.analyzeStockROIC(stockInfo.stockList, stockInfo.season);
 
     /**
      * 导出MSCI股票ROIC数据
      */
-    // await ExcelUtils.exportStockROIC();
+    await ExcelUtils.exportStockROIC(stockInfo.season);
 
 };
 

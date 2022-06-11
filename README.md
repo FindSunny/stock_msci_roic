@@ -1,6 +1,10 @@
 # stock_msci_roic
 ROIC based on MSCI index
 
+## 请注意
+初代版本：本代码需要连接本地Mysql数据库进行数据计算
+最终产出ROIC excel文档。
+
 ## 一, ROIC是什么？
 ROIC = NOPLAT ÷ IC （投资资本回报率 = 税后经营利润 ÷ 期初投入资本）
 

@@ -4,7 +4,68 @@ CREATE TABLE `stock` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `stock_code` varchar(255) DEFAULT NULL COMMENT '股票代码',
   `stock_name` varchar(255) DEFAULT NULL COMMENT '股票名称',
-  `create_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `update_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `season` varchar(255) DEFAULT NULL,
+  `median_roic` decimal(10,2) DEFAULT '0' COMMENT 'ROIC中位数',
+  `var_roic` decimal(10,2) DEFAULT '0' COMMENT 'ROIC方差',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=769 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 利润表
+CREATE TABLE `income_statement` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `stock_code` varchar(255) DEFAULT NULL,
+  `stock_name` varchar(255) DEFAULT NULL COMMENT '名称',
+  `report_date` varchar(255) DEFAULT NULL COMMENT '报告年度',
+  `finance_expense` decimal(60,2) DEFAULT '0' COMMENT '财务费用',
+  `profit_from_operation` decimal(60,2) DEFAULT '0' COMMENT '营业利润',
+  `profit_beforetax` decimal(60,2) DEFAULT '0' COMMENT '利润总额',
+  `less_incometax` decimal(60,2) DEFAULT '0' COMMENT '减：所得税',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 资产负债表 balance_sheet
+CREATE TABLE `balance_sheet` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `stock_code` varchar(255) DEFAULT NULL,
+  `stock_name` varchar(255) DEFAULT NULL COMMENT '名称',
+  `report_date` varchar(255) DEFAULT NULL COMMENT '报告年度',
+  `short_term_loans` decimal(60,2) DEFAULT '0' COMMENT '短期借款',
+  `one_year_current_liability` decimal(60,2) DEFAULT '0' COMMENT '一年内到期的非流动负债',
+  `long_term_loans` decimal(60,2) DEFAULT '0' COMMENT '长期借款',
+  `bonds_payable` decimal(60,2) DEFAULT '0' COMMENT '应付债券',
+  `long_term_payable` decimal(60,2) DEFAULT '0' COMMENT '长期应付款',
+  `other_current_liability` decimal(60,2) DEFAULT '0' COMMENT '其他非流动负债',
+  `owners_equity` decimal(60,2) DEFAULT '0' COMMENT '所有者权益（或股东权益）合计',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ROIC计算表 roic_calculation
+CREATE TABLE `roic_calculation` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `stock_code` varchar(255) DEFAULT NULL,
+  `stock_name` varchar(255) DEFAULT NULL COMMENT '名称',
+  `report_date` varchar(255) DEFAULT NULL COMMENT '报告年度',
+  `finance_expense` decimal(60,2) DEFAULT '0' COMMENT '财务费用',
+  `profit_from_operation` decimal(60,2) DEFAULT '0' COMMENT '营业利润',
+  `profit_beforetax` decimal(60,2) DEFAULT '0' COMMENT '利润总额',
+  `less_incometax` decimal(60,2) DEFAULT '0' COMMENT '减：所得税',
+  `short_term_loans` decimal(60,2) DEFAULT '0' COMMENT '短期借款',
+  `one_year_current_liability` decimal(60,2) DEFAULT '0' COMMENT '一年内到期的非流动负债',
+  `long_term_loans` decimal(60,2) DEFAULT '0' COMMENT '长期借款',
+  `bonds_payable` decimal(60,2) DEFAULT '0' COMMENT '应付债券',
+  `long_term_payable` decimal(60,2) DEFAULT '0' COMMENT '长期应付款',
+  `other_current_liability` decimal(60,2) DEFAULT '0' COMMENT '其他非流动负债',
+  `owners_equity` decimal(60,2) DEFAULT '0' COMMENT '所有者权益（或股东权益）合计',
+  `profil_aftertax` decimal(60,2) DEFAULT '0' COMMENT '税后经营利润',
+  `begin_invested` decimal(60,2) DEFAULT '0' COMMENT '期初投入资本',
+  `roic` decimal(60,2) DEFAULT '0' COMMENT '本期ROIC计算',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

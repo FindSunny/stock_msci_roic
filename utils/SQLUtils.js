@@ -38,15 +38,12 @@ const SQLUtils = {
                 if (err) {
                     reject(err);
                 } else {
-                    // 打印SQL日志
-                    console.log('result: ', results.sql);
                     resolve(results);
                 }
                 connection.end();
             });
         });
-    }
-
+    },
 };
 
 module.exports = SQLUtils;

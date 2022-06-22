@@ -1,0 +1,17 @@
+
+<svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">
+    <g>
+        <g>
+            <path fill-opacity="0" stroke-width="5" stroke="rgb(229, 27, 35)" stroke-linecap="round" d="M 214.3 91.3 L 213.5 53.3 Q 248.5 6.3 283.6 53.3 L 283.6 91"/>
+            <path fill-opacity="0" stroke-width="5" stroke="rgb(229, 27, 35)" stroke-linecap="round" d="M 94.2 131 L 204.3 86 L 198.3 94 Q 248.5 113.4 298.8 94.4 L 292.8 86.4 L 402.8 131"/>
+        </g>
+        <path fill-opacity="0" stroke-width="5" stroke="rgb(229, 27, 35)" stroke-linecap="round" d="M 91.5 140 Q 248.5 179 405.5 140"/>
+    </g>
+    <text font-family="Impact" textLength="187.6" font-size="115.1" font-stretch="narrower" x="155.7" y="278.5" fill="rgb(229, 27, 35)">
+        SUO
+    </text>
+    <text textLength="229.6" x="138.7" y="344.6" fill="black" font-family="'Segoe Script'" font-size="50">
+        Jian Fei
+    </text>
+    
+</svg>

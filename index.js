@@ -15,44 +15,33 @@ const ExcelUtils = require('./utils/ExcelUtils');
 const init = async () => {
 
     // 要处理的文件名称
-    const fileName = '2022-06-11.xls';
-    // 文件类型， 1：同花顺， 2：MSCI官网
-    const fileType = 1;
+    const fileName = '2024-09-11.xls';
 
     /**
      * 异步读取Excel文件
-     */
-    const stockInfo = await readNSaveExcelFile(fileName, fileType);
+    //  */
+    // const stockInfos = await readNSaveExcelFile(fileName);
 
-    if (!stockInfo.stockList || stockInfo.stockList.length === 0) {
-        console.log('readNSaveExcelFile is out of control!!!!');
-        return;
-    }
-
+    // if (!stockInfos || stockInfos.length === 0) {
+    //     console.log('readNSaveExcelFile is out of control!!!!');
+    //     return;
+    // }
     /**
-     * 将股票列表，插入数据库
+     * 将股票列表，插入数据库(已插入)
      */
-    await StockUtils.insertStockList(stockInfo.stockList, stockInfo.season);
-
-    /**
-     * 批量获取MSCI股票数据
-     */
-    await StockUtils.fetchStockData(stockInfo.stockList);
-
-    /**
-     * 计算MSCI股票ROIC数据
-     */
-    await StockUtils.calculateStockROIC(stockInfo.stockList, stockInfo.season);
+    // await StockUtils.insertStockList(stockInfos);
     
     /**
      * 分析MSCI股票ROIC数据
      */
-    await StockUtils.analyzeStockROIC(stockInfo.stockList, stockInfo.season);
+    await StockUtils.analyzeStockROIC();
 
     /**
      * 导出MSCI股票ROIC数据
      */
-    await ExcelUtils.exportStockROIC(stockInfo.season);
+    // await ExcelUtils.exportStockROIC(stockInfo.season);
+
+    console.log("执行完成！");
 
 };
 

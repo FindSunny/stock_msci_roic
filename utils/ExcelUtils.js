@@ -11,17 +11,12 @@ const ExcelUtils = {
      * 
      * @return {Promise}
     */
-    readNSaveExcelFile: async (fileName, fileType) => {
+    readNSaveExcelFile: async (fileName) => {
 
         let path = './input/' + fileName
 
-        if (fileType == 1) {
-            // 同花顺
-            return await ExcelUtils.readNSaveTHSFile(path);
-        } else if (fileType == 2) {
-            // MSCI
-            return await ExcelUtils.readNSaveMSCIFile(path);
-        }
+        // 同花顺
+        return await ExcelUtils.readNSaveTHSFile(path);
     },
 
     /**
@@ -33,23 +28,21 @@ const ExcelUtils = {
         // 获取工作表
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-        // 初始化season, 截取sheetName前7位
-        let season = path.substring(8, 15);
-
         // 初始化stockList
         let stockList = [];
         let row = 2;
         do {
             // 获取单元格数据
             let stockCode = sheet['A' + row].v.substring(0, 6);
-            stockList.push(stockCode);
+            let stockName = sheet['B' + row].v;
+            stockList.push({
+                code: stockCode,
+                name: stockName
+            });
             row++;
         } while (sheet['A' + row] && sheet['A' + row].v);
 
-        return {
-            stockList: stockList,
-            season: season
-        };
+        return stockList;
     },
 
     /**

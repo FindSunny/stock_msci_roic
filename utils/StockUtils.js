@@ -9,187 +9,39 @@ const StockUtils = {
     /**
      * 批量插入股票代码列表
      * @param {*} stockList 股票代码列表 
-     * @param {*} season 插入季度
      * @returns 
      */
 
-    insertStockList: async (stockList, season) => {
-
-        // 查看数据库有无数据
-        const querySql = 'SELECT * FROM stock where season = ?';
-        const queryResult = await SQLUtils.execute(querySql, [season]);
-        if (queryResult.length > 0) {
-            console.log('数据库已有数据，不需要插入数据');
-            return;
-        }
+    insertStockList: async (stockList) => {
 
         // 整理股票代码列表
         const stockCodeList = [];
         for (let index = 0; index < stockList.length; index++) {
-            const stockCode = stockList[index];
-            stockCodeList.push('("' + stockCode + '","' + season + '")');
+            const stockInfo = stockList[index];
 
+            // 查看数据库有无数据
+            const querySql = 'SELECT * FROM stock where stock_code = ?';
+            const queryResult = await SQLUtils.execute(querySql, [stockInfo.code]);
+            if (queryResult.length > 0) {
+                console.log('数据库已有数据，不需要插入数据');
+                return;
+            }
+            stockCodeList.push({
+                stock_code: stockInfo.code,
+                stock_name: stockInfo.name
+            });
         }
-        const sql = `INSERT INTO stock (stock_code, season) VALUES ${stockCodeList.join(',')}`;
+        const sql = `INSERT INTO stock (stock_code, stock_name) VALUES ?`;
+        const params = [];
+        for (let index = 0; index < stockCodeList.length; index++) {
+            const stock = stockCodeList[index];
+            params.push([stock.stock_code, stock.stock_name]);
+        }
         // 执行sql语句
-        const result = await SQLUtils.execute(sql);
+        const result = await SQLUtils.execute(sql, [params]);
         // 打印日志
         console.log('股票信息表，数据已插入: ', result.affectedRows, '条数据');
         return result;
-
-    },
-
-    /**
-     * 批量插入利润表数据
-     * 
-     * @param {String} stockCode 股票代码
-     * @param {Array} profitList 利润表数据
-     * @return {Promise}
-     */
-    insertProfitData: async (stockCode, profitList) => {
-
-        // 整理利润表数据
-        const profitDataList = [];
-        for (let index = 0; index < profitList.length; index++) {
-            const profitData = profitList[index];
-            profitDataList.push('("' + stockCode + '","'
-                + profitData.SECNAME + '","'
-                + profitData.F001D + '","'
-                + (profitData.F018N ? profitData.F018N : 0) + '","'
-                + (profitData.F012N ? profitData.F012N : 0) + '","'
-                + (profitData.F024N ? profitData.F024N : 0) + '","'
-                + (profitData.F025N ? profitData.F025N : 0) + '")');
-        }
-        const sql = `INSERT INTO income_statement (stock_code, stock_name, report_date, 
-            finance_expense, profit_from_operation, profit_beforetax, less_incometax
-            ) VALUES ${profitDataList.join(',')}`;
-        // 执行sql语句
-        const result = await SQLUtils.execute(sql);
-        // 打印日志
-        console.log('已插入利润表数据, 股票代码: ', stockCode, '共', result.affectedRows, '条数据');
-    },
-
-    /**
-     * 批量插入资产负债表数据
-     * 
-     * @param {String} stockCode 股票代码
-     * @param {Array} balanceList 资产负债表数据
-     * @return {Promise}
-    */
-    insertBalanceData: async (stockCode, balanceList) => {
-
-        // 整理资产负债表数据
-        const balanceDataList = [];
-        for (let index = 0; index < balanceList.length; index++) {
-            const balanceData = balanceList[index];
-            balanceDataList.push('("' + stockCode + '","'
-                + balanceData.SECNAME + '","'
-                + balanceData.F001D + '","'
-                + (balanceData.F039N ? balanceData.F039N : 0) + '","'
-                + (balanceData.F050N ? balanceData.F050N : 0) + '","'
-                + (balanceData.F053N ? balanceData.F053N : 0) + '","'
-                + (balanceData.F054N ? balanceData.F054N : 0) + '","'
-                + (balanceData.F055N ? balanceData.F055N : 0) + '","'
-                + (balanceData.F059N ? balanceData.F059N : 0) + '","'
-                + (balanceData.F070N ? balanceData.F070N : 0) + '")');
-        }
-        // 整理SQL语句
-        const sql = `INSERT INTO balance_sheet (stock_code, 
-            stock_name, report_date, short_term_loans, 
-            one_year_current_liability, long_term_loans, 
-            bonds_payable, long_term_payable, other_current_liability, owners_equity
-            ) VALUES ${balanceDataList.join(',')}`;
-        // 执行sql语句
-        const result = await SQLUtils.execute(sql);
-        // 打印日志
-        console.log('已插入资产负债表数据, 股票代码: ', stockCode, '共', result.affectedRows, '条数据');
-    },
-
-
-    /**
-     * 批量获取MSCI股票数据
-     * @param {Array} stockList 股票列表
-     * @param {Function} callback 回调函数
-     * @return {Array} 股票数据
-     */
-    fetchStockData: async (stockList) => {
-        console.log('开始获取巨潮股票数据，较耗时间，请耐心等待...');
-
-        // 获取当前年月
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1;
-        const edate = year + '-' + (month < 10 ? '0' + month : month) + '-01';
-        // 获取上5年的年月
-        const sdate = year - 5 + '-' + (month < 10 ? '0' + month : month) + '-01';
-
-        // 获取利润表数据
-        await StockUtils.fetchProfitData(stockList, sdate, edate);
-
-        // 获取资产负债表数据
-        await StockUtils.fetchBalanceData(stockList, sdate, edate);
-
-        // 打印日志
-        console.log('已获取全部巨潮股票数据！');
-    },
-
-    /**
-     * 批量获取利润表数据
-     * @param {Array} stockList 股票列表
-     * @return {*} result 处理结果
-     */
-    fetchProfitData: async (stockList, sdate, edate) => {
-
-        // 获取利润表数据
-        for (let index = 0; index < stockList.length; index++) {
-            const stockCode = stockList[index];
-
-            // 查看数据库有无数据
-            const querySql = 'SELECT * FROM income_statement where stock_code = ?';
-            const queryResult = await SQLUtils.execute(querySql, [stockCode]);
-            if (queryResult.length > 0) {
-                // console.log('利润表数据已有数据，不需要查询数据：', stockCode);
-                continue;
-            }
-
-            let data = await HttpUtils.getProfitData(stockCode, sdate, edate);
-            if (data.resultcode == '200') {
-                // 插入利润表数据
-                await StockUtils.insertProfitData(stockCode, data.records);
-            } else {
-                console.log(data.resultcode + ': ' + data.resultmsg);
-            }
-        }
-
-    },
-
-    /**
-     * 批量获取资产负债表数据
-     * @param {Array} stockList 股票列表
-     * @return {*} result 处理结果
-     */
-    fetchBalanceData: async (stockList, sdate, edate) => {
-
-        // 获取资产负债表数据
-        for (let index = 0; index < stockList.length; index++) {
-            const stockCode = stockList[index];
-
-            // 查看数据库有无数据
-            const querySql = 'SELECT * FROM balance_sheet where stock_code = ?';
-            const queryResult = await SQLUtils.execute(querySql, [stockCode]);
-            if (queryResult.length > 0) {
-                // console.log('资产负债表数据已有数据，不需要查询数据：', stockCode);
-                continue;
-            }
-
-            let data = await HttpUtils.getBalanceData(stockCode, sdate, edate);
-            if (data.resultcode == '200') {
-                // 插入资产负债表数据
-                await StockUtils.insertBalanceData(stockCode, data.records);
-            } else {
-                console.log(data.resultcode + ': ' + data.resultmsg);
-            }
-        }
 
     },
 
@@ -275,16 +127,24 @@ const StockUtils = {
 
     /**
      * 分析MSCI股票ROIC数据
-     * @param {Array} stockList 股票列表
-     * @param {String} season 季度
      * @returns 
      */
-    analyzeStockROIC: async (stockList, season) => {
+    analyzeStockROIC: async () => {
+
+        // 查询全部数据
+        let queryStock = `SELECT * FROM stock;`
+        const stocks = await SQLUtils.execute(queryStock);
+        if (stocks.length == 0) {
+            console.log("无股票数据");
+            return;
+        }
+
         // 计算ROIC的中位数和方差
         console.log('开始计算ROIC的中位数和方差...');
-        
-        for (let index = 0; index < stockList.length; index++) {
-            const stockCode = stockList[index];
+
+        for (let index = 0; index < stocks.length; index++) {
+            const stockInfo = stocks[index];
+            const stockCode = stockInfo.stock_code ;
 
             // 查询指定股票code的ROIC数据
             const querySql = 'SELECT stock_code, stock_name, CAST((roic * 10000) AS decimal(10,0)) as roic FROM roic_calculation where stock_code = ?';
@@ -298,8 +158,8 @@ const StockUtils = {
             const variance = StockUtils.calculateVariance(queryResult) / 10000;
 
             //更新股票表中的数据
-            const updateSql = 'UPDATE stock SET stock_name = ?, median_roic = ?, var_roic = ? WHERE stock_code = ? and season = ?';
-            await SQLUtils.execute(updateSql, [queryResult[0].stock_name, median, variance, stockCode, season]);
+            const updateSql = 'UPDATE stock SET median_roic = ?, var_roic = ? WHERE stock_code = ?';
+            await SQLUtils.execute(updateSql, [median, variance, stockCode]);
             console.log(`已成功更新${stockCode}-${queryResult[0].stock_name}的ROIC的中位数和方差: ${median}, ${variance}`);
         }
     },

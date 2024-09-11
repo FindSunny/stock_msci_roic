@@ -16,8 +16,11 @@ ROIC = NOPLAT ÷ IC （投资资本回报率 = 税后经营利润 ÷ 期初投�
         □ 股东权益 = 所有者权益
         □ 有息负债 =  短期借款 + 长期借款 + 一年内到期的非流动负债 + 应付债券 + 长期应付款 + 其他流动负债
 
+> 2024-09-11 更新算法
+ROIC＝归属于母公司股东的净利润×2／（期初全部投入资本＋期末全部投入资本）
+> ※使用同花顺问财直接获取ROIC数据，可忽略后续计算步骤
+https://www.iwencai.com/stockpick/search?rsh=3&typed=1&preParams=&ts=1&f=1&qs=result_rewrite&selfsectsn=&querytype=stock&searchfilter=&tid=stockpick&w=2021年二季度ROIC不为空,非ST&queryarea=
 
-扣除调整税后的净营业利润 = 
 
 ## 二,MSCI China ROIC精选好企业（By 三思社）
 ROIC相较于其他指标可以更真实的反映公司主营业务运营的真实情况，尤其是剔除了财务杠杆和非经常损益的影响。在此我通过ROIC来筛选MSCI Chian成分股中的“优质股”，即拥有高且稳定ROIC的企业，这些企业有较深的护城河及竞争优势。
@@ -44,3 +47,18 @@ http://webapi.cninfo.com.cn/#/apiDoc
 #### 1. 打开 http://webapi.cninfo.com.cn/#/dataBrowse
 #### 2. F12查看文件： json2csv.js
 #### 3. indexCode，即mcCode
+
+## 三，其他
+> mysql安装 https://dev.mysql.com/downloads/mysql/
+
+### 1. 安装mysql 8.0最好
+
+### 2. 切换认证模式至 mysql_native_password, 以支持Node.js连接
+```cmd
+mysql -u root
+use mysql;
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'toor';
+FLUSH PRIVILEGES;
+EXIT;
+```

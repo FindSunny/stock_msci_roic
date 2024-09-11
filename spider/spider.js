@@ -24,15 +24,15 @@ const main = async () => {
     // 2024-1 OK
     // 2023-4 ING
     // 指定年份及季度
-    // let year = 2024;
-    let year = 2023;
+    let year = 2024;
+    // let year = 2023;
     // let year = 2022;
     // let year = 2021;
     // let year = 2020;
     // let year = 2019;
-    let season = 4;
+    // let season = 4;
     // let season = 3;
-    // let season = 2;
+    let season = 2;
     // let season = 1;
     // for (let i = 1; i <= 4; i++) {
     // 2.获取ROIC数据
@@ -124,8 +124,9 @@ const getROICList = async (page, year, seanon) => {
         stock.stock_code = item["code"];
         stock.stock_name = item["股票简称"];
         stock.report_date = year + '-' + seanon;
-        stock.net_profit = item["归属于母公司所有者的净利润"];
-        stock.end_total_invested_capital = item["全部投入资本"];
+        stock.net_profit = item["归属于母公司所有者的净利润"] ? item["归属于母公司所有者的净利润"] / 100000000 : 0;
+        // '6.02799666E10' 转换为亿级别二位小数
+        stock.end_total_invested_capital = item["全部投入资本"] ? item["全部投入资本"] / 100000000 : 0;
         finalList.push(stock);
     });
 
@@ -140,10 +141,10 @@ const getROICList = async (page, year, seanon) => {
     fs.writeFileSync(`./output/roics_${new Date().toLocaleDateString().split('/').join('-')}.json`, json);
 
     // 保存到数据库
-    let sql = 'INSERT INTO roic_calculation(stock_code, stock_name, report_date, roic) VALUES ?';
+    let sql = 'INSERT INTO roic_calculation(stock_code, stock_name, net_profit, end_total_invested_capital) VALUES ?';
     let params = [];
     finalList.forEach(function (item, index) {
-        params.push([item.stock_code, item.stock_name, item.report_date, item.roic]);
+        params.push([item.stock_code, item.stock_name, item.net_profit, item.end_total_invested_capital]);
     });
     const resultSQL = await SQLUtils.execute(sql, [params]);
     console.log(new Date().toLocaleDateString() + ' 数据写入数据库成功,共' + resultSQL.affectedRows + '条数据');

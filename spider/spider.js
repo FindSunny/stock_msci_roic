@@ -141,10 +141,10 @@ const getROICList = async (page, year, seanon) => {
     fs.writeFileSync(`./output/roics_${new Date().toLocaleDateString().split('/').join('-')}.json`, json);
 
     // 保存到数据库
-    let sql = 'INSERT INTO roic_calculation(stock_code, stock_name, net_profit, end_total_invested_capital) VALUES ?';
+    let sql = 'INSERT INTO roic_calculation(stock_code, stock_name, report_date, net_profit, end_total_invested_capital) VALUES ?';
     let params = [];
     finalList.forEach(function (item, index) {
-        params.push([item.stock_code, item.stock_name, item.net_profit, item.end_total_invested_capital]);
+        params.push([item.stock_code, item.stock_name, item.report_date, item.net_profit, item.end_total_invested_capital]);
     });
     const resultSQL = await SQLUtils.execute(sql, [params]);
     console.log(new Date().toLocaleDateString() + ' 数据写入数据库成功,共' + resultSQL.affectedRows + '条数据');

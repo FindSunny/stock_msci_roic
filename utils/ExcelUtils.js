@@ -35,9 +35,11 @@ const ExcelUtils = {
             // 获取单元格数据
             let stockCode = sheet['A' + row].v.substring(0, 6);
             let stockName = sheet['B' + row].v;
+            let industry = sheet['G' + row].v;
             stockList.push({
                 code: stockCode,
-                name: stockName
+                name: stockName,
+                industry: industry
             });
             row++;
         } while (sheet['A' + row] && sheet['A' + row].v);

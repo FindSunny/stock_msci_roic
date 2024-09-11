@@ -7,6 +7,8 @@ CREATE TABLE `msci_stock`.`stock` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `stock_code` varchar(255) DEFAULT NULL COMMENT '股票代码',
   `stock_name` varchar(255) DEFAULT NULL COMMENT '股票名称',
+  -- 行业
+  `industry` varchar(255) DEFAULT NULL COMMENT '行业',
   `median_roic` decimal(10,4) DEFAULT '0.0000' COMMENT 'ROIC中位数',
   `var_roic` decimal(10,4) DEFAULT '0.0000' COMMENT 'ROIC方差',
   -- 报告期数量

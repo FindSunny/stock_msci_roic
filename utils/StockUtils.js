@@ -28,14 +28,15 @@ const StockUtils = {
             }
             stockCodeList.push({
                 stock_code: stockInfo.code,
-                stock_name: stockInfo.name
+                stock_name: stockInfo.name,
+                industry: stockInfo.industry
             });
         }
-        const sql = `INSERT INTO stock (stock_code, stock_name) VALUES ?`;
+        const sql = `INSERT INTO stock (stock_code, stock_name, industry) VALUES ?`;
         const params = [];
         for (let index = 0; index < stockCodeList.length; index++) {
             const stock = stockCodeList[index];
-            params.push([stock.stock_code, stock.stock_name]);
+            params.push([stock.stock_code, stock.stock_name, stock.industry]);
         }
         // 执行sql语句
         const result = await SQLUtils.execute(sql, [params]);

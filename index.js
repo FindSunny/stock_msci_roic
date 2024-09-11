@@ -30,6 +30,11 @@ const init = async () => {
      * 将股票列表，插入数据库(已插入)
      */
     // await StockUtils.insertStockList(stockInfos);
+
+    /**
+     * 计算股票ROIC数据, 报告期数据有更新时，必须执行一次
+     */
+    await StockUtils.calculateStockROIC();
     
     /**
      * 分析MSCI股票ROIC数据

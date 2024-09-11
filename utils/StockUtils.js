@@ -47,82 +47,58 @@ const StockUtils = {
 
     /**
      * 计算MSCI股票ROIC数据
-     * @return {*} result 处理结果
      */
     calculateStockROIC: async () => {
 
-        // 清空ROIC表数据
-        console.log('开始清空ROIC表数据...');
-        await SQLUtils.execute('DELETE FROM roic_calculation');
-        console.log('已清空ROIC表数据!');
+        // 查询全部数据
+        let queryStock = `SELECT * FROM stock;`
+        const stocks = await SQLUtils.execute(queryStock);
+        if (stocks.length == 0) {
+            console.log("无股票数据");
+            return;
+        }
 
-        // 插入ROIC表的利润和资产负债数据
-        // 组织SQL语句
-        let sql = `INSERT INTO roic_calculation (
-                    stock_code,
-                    stock_name,
-                    report_date,
-                    finance_expense,
-                    profit_from_operation,
-                    profit_beforetax,
-                    less_incometax,
-                    short_term_loans,
-                    one_year_current_liability,
-                    long_term_loans,
-                    bonds_payable,
-                    long_term_payable,
-                    other_current_liability,
-                    owners_equity,
-                    profil_aftertax,
-                    begin_invested,
-                    roic
-                ) SELECT
-                    a.stock_code AS stock_code,
-                    a.stock_name AS stock_name,
-                    b.report_date AS report_date,
-                    a.finance_expense AS finance_expense,
-                    a.profit_from_operation AS profit_from_operation,
-                    a.profit_beforetax AS profit_beforetax,
-                    a.less_incometax AS less_incometax,
-                    b.short_term_loans AS short_term_loans,
-                    b.one_year_current_liability AS one_year_current_liability,
-                    b.long_term_loans AS long_term_loans,
-                    b.bonds_payable AS bonds_payable,
-                    b.long_term_payable AS long_term_payable,
-                    b.other_current_liability AS other_current_liability,
-                    b.owners_equity AS owners_equity,
-                    CAST(
-                        (
-                            finance_expense + profit_from_operation
-                        ) * (
-                            1 - (
-                                less_incometax / profit_beforetax
-                            )
-                        ) AS DECIMAL (60, 2)
-                    ) AS profil_aftertax,
-                    CAST(
-                        short_term_loans + one_year_current_liability + long_term_loans + bonds_payable + long_term_payable + other_current_liability + owners_equity AS DECIMAL (60, 2)
-                    ) AS begin_invested,
-                    CAST(
-                        CAST(
-                            (
-                                finance_expense + profit_from_operation
-                            ) * (
-                                1 - (
-                                    less_incometax / profit_beforetax
-                                )
-                            ) AS DECIMAL (60, 2)
-                        ) / CAST(
-                            short_term_loans + one_year_current_liability + long_term_loans + bonds_payable + long_term_payable + other_current_liability + owners_equity AS DECIMAL (60, 2)
-                        ) AS DECIMAL (60, 4)
-                    ) AS roic
-                FROM
-                    income_statement a
-                INNER JOIN balance_sheet b ON a.stock_code = b.stock_code
-                AND a.report_date = b.report_date;`;
-        console.log('开始插入ROIC表的利润和资产负债数据，耗时较长，请耐心等待...');
-        await SQLUtils.execute(sql);
-        console.log('已成功插入ROIC表的利润和资产负债数据!');
+        for (let index = 0; index < stocks.length; index++) {
+            const stockInfo = stocks[index];
+            const stockCode = stockInfo.stock_code;
+            // 查询roic数据表
+            let querySql = `SELECT * FROM roic_calculation WHERE stock_code = ? ORDER BY report_date DESC;`;
+            let roics = await StockUtils.execute(querySql, [stockCode]);
+            if (roics.length == 0 || roics.length == 1) {
+                console.log(`无${stockCode}的ROIC数据`);
+                continue;
+            }
+            // 更新净利润及资产等数据，最后一条数据为初始化数据，不需要更新
+            for (let i = 0; i < roics.length - 1; i++) {
+                // 当前年份
+                let currentYear = roics[i].report_date.substring(0, 4);
+                // 当前季度
+                let currentQuarter = roics[i].report_date.substring(5, 6);
+                // 若当前季度是第一季度，则上季度为去年第四季度
+                let lastQuarter = currentQuarter == 1 ? 4 : currentQuarter - 1;
+
+                // 仅年度出现变化时，更新当期净利润
+                let currentProfit = roics[i].net_profit;
+                if (lastQuarter != 4) {
+                    // 赋值当期净利润 = 本报告期净利润 - 上季度净利润
+                    currentProfit = currentProfit - roics[i + 1].net_profit;
+                }
+                // 期初全部投入资本 = 上季度全部投入资本
+                let initialCapital = roics[i + 1].end_total_invested_capital;
+            
+                // 计算ROIC = 本期净利润 * 2 / (期初全部投入资本 + 本期全部投入资本)
+                let roic = (currentProfit * 2) / (initialCapital + roics[i].end_total_invested_capital);
+                // 保留两位小数
+                roic = Math.round(roic * 10000) / 10000;
+
+                // 更新ROIC数据
+                let updateSql = `UPDATE roic_calculation SET roic = ?, current_net_profit = ?, start_total_invested_capital = ? WHERE stock_code = ? AND report_date = ?;`;
+                await SQLUtils.execute(updateSql, [roic, currentProfit, initialCapital, stockCode, roics[i].report_date]);
+                console.log(new Date().toLocaleString(), `已成功更新${stockCode} ${roics[i].report_date}的 ${roics[i].report_date} ROIC数据: ${roic}`);
+            }
+
+        }
+        console.log(new Date().toLocaleString(), '所有股票ROIC数据已更新完毕');
     },
 
     /**
@@ -144,7 +120,7 @@ const StockUtils = {
 
         for (let index = 0; index < stocks.length; index++) {
             const stockInfo = stocks[index];
-            const stockCode = stockInfo.stock_code ;
+            const stockCode = stockInfo.stock_code;
 
             // 查询指定股票code的ROIC数据
             const querySql = 'SELECT stock_code, stock_name, CAST((roic * 10000) AS decimal(10,0)) as roic FROM roic_calculation where stock_code = ?';
@@ -158,8 +134,8 @@ const StockUtils = {
             const variance = StockUtils.calculateVariance(queryResult) / 10000;
 
             //更新股票表中的数据
-            const updateSql = 'UPDATE stock SET median_roic = ?, var_roic = ? WHERE stock_code = ?';
-            await SQLUtils.execute(updateSql, [median, variance, stockCode]);
+            const updateSql = 'UPDATE stock SET median_roic = ?, var_roic = ?, report_count = ? WHERE stock_code = ?';
+            await SQLUtils.execute(updateSql, [median, variance, queryResult.length, stockCode]);
             console.log(`已成功更新${stockCode}-${queryResult[0].stock_name}的ROIC的中位数和方差: ${median}, ${variance}`);
         }
     },

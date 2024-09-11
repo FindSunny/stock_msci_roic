@@ -46,7 +46,8 @@ const main = async () => {
 
 // 获取剩余规模
 const getROICList = async (page, year, seanon) => {
-    const keyWord = `${year}年${seanon}季度ROIC不为空,非ST`;
+    // 2024年第2季度归属于母公司股东的净利润不为空，全部投入资本不为空
+    const keyWord = `${year}年第${seanon}季度归属于母公司股东的净利润不为空,全部投入资本不为空,非ST`;
     console.log(new Date().toLocaleDateString() + ' 开始获取数据:' + keyWord);
     let bondsList = [];
     let totalPage = 0;
@@ -105,7 +106,7 @@ const getROICList = async (page, year, seanon) => {
         await new Promise((resolve) => {
             setTimeout(() => {
                 resolve();
-            }, 1000);
+            }, 2000);
         });
     }
 
@@ -123,7 +124,8 @@ const getROICList = async (page, year, seanon) => {
         stock.stock_code = item["code"];
         stock.stock_name = item["股票简称"];
         stock.report_date = year + '-' + seanon;
-        stock.roic = item["投入资本回报率roic"];
+        stock.net_profit = item["归属于母公司所有者的净利润"];
+        stock.end_total_invested_capital = item["全部投入资本"];
         finalList.push(stock);
     });
 

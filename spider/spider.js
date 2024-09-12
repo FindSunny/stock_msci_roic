@@ -17,15 +17,17 @@ const main = async () => {
     });
 
     const page = await browser.newPage();
-    console.log(new Date().toLocaleDateString() + ' 浏览器已打开');
+    console.log(new Date().toLocaleString() + ' 浏览器已打开');
 
     // 获取指定年份的roic, 默认获取到2019-2
     // 2024-2 OK
     // 2024-1 OK
-    // 2023-4 ING
+    // 2023-4 OK
+    // 2023-3 OK
+    // 2023-2 ING
     // 指定年份及季度
-    let year = 2024;
-    // let year = 2023;
+    // let year = 2024;
+    let year = 2023;
     // let year = 2022;
     // let year = 2021;
     // let year = 2020;
@@ -48,7 +50,7 @@ const main = async () => {
 const getROICList = async (page, year, seanon) => {
     // 2024年第2季度归属于母公司股东的净利润不为空，全部投入资本不为空
     const keyWord = `${year}年第${seanon}季度归属于母公司股东的净利润不为空,全部投入资本不为空,非ST`;
-    console.log(new Date().toLocaleDateString() + ' 开始获取数据:' + keyWord);
+    console.log(new Date().toLocaleString() + ' 开始获取数据:' + keyWord);
     let bondsList = [];
     let totalPage = 0;
     // 1.打开页面
@@ -79,7 +81,7 @@ const getROICList = async (page, year, seanon) => {
     let firstPageList = responseBody.answer.components[0].data.datas;
     // 加入列表
     bondsList = bondsList.concat(firstPageList);
-    console.log(new Date().toLocaleDateString() + ' 第1页数据获取成功,共' + totalPage + '页');
+    console.log(new Date().toLocaleString() + ' 第1页数据获取成功,共' + totalPage + '页');
     // -----------------
     // 测试代码 仅获取前两页数据
     // totalPage = 1;
@@ -100,7 +102,7 @@ const getROICList = async (page, year, seanon) => {
         let otherPageList = responseBody.answer.components[0].data.datas;
         // 加入列表
         bondsList = bondsList.concat(otherPageList);
-        console.log(new Date().toLocaleDateString() + ' 第' + i + '页数据获取成功,共' + totalPage + '页');
+        console.log(new Date().toLocaleString() + ' 第' + i + '页数据获取成功,共' + totalPage + '页');
 
         // 等待2s
         await new Promise((resolve) => {
@@ -110,7 +112,7 @@ const getROICList = async (page, year, seanon) => {
         });
     }
 
-    console.log(new Date().toLocaleDateString() + ' 数据获取完毕,共' + bondsList.length + '条数据');
+    console.log(new Date().toLocaleString() + ' 数据获取完毕,共' + bondsList.length + '条数据');
 
     // 3.整理数据
     // 3.1 替换掉多余的字符: 如 [20231106]
@@ -138,7 +140,7 @@ const getROICList = async (page, year, seanon) => {
     // json = json.replace(/"scale":"/g, '"scale":');
     // "} 替换为 }
     // json = json.replace(/"\}/g, '}');
-    fs.writeFileSync(`./output/roics_${new Date().toLocaleDateString().split('/').join('-')}.json`, json);
+    fs.writeFileSync(`./output/roics_${year + '-' + seanon}.json`, json);
 
     // 保存到数据库
     let sql = 'INSERT INTO roic_calculation(stock_code, stock_name, report_date, net_profit, end_total_invested_capital) VALUES ?';
@@ -147,9 +149,9 @@ const getROICList = async (page, year, seanon) => {
         params.push([item.stock_code, item.stock_name, item.report_date, item.net_profit, item.end_total_invested_capital]);
     });
     const resultSQL = await SQLUtils.execute(sql, [params]);
-    console.log(new Date().toLocaleDateString() + ' 数据写入数据库成功,共' + resultSQL.affectedRows + '条数据');
+    console.log(new Date().toLocaleString() + ' 数据写入数据库成功,共' + resultSQL.affectedRows + '条数据');
 
-    console.log(new Date().toLocaleDateString() + ' 数据写入文件成功');
+    console.log(new Date().toLocaleString() + ' 数据写入文件成功');
 }
 
 (async () => {

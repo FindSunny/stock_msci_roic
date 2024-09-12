@@ -64,7 +64,7 @@ const StockUtils = {
             const stockCode = stockInfo.stock_code;
             // 查询roic数据表
             let querySql = `SELECT * FROM roic_calculation WHERE stock_code = ? ORDER BY report_date DESC;`;
-            let roics = await StockUtils.execute(querySql, [stockCode]);
+            let roics = await SQLUtils.execute(querySql, [stockCode]);
             if (roics.length == 0 || roics.length == 1) {
                 console.log(`无${stockCode}的ROIC数据`);
                 continue;
@@ -90,12 +90,12 @@ const StockUtils = {
                 // 计算ROIC = 本期净利润 * 2 / (期初全部投入资本 + 本期全部投入资本)
                 let roic = (currentProfit * 2) / (initialCapital + roics[i].end_total_invested_capital);
                 // 保留两位小数
-                roic = Math.round(roic * 10000) / 10000;
+                roic = Math.round(roic * 10000) / 100;
 
                 // 更新ROIC数据
                 let updateSql = `UPDATE roic_calculation SET roic = ?, current_net_profit = ?, start_total_invested_capital = ? WHERE stock_code = ? AND report_date = ?;`;
                 await SQLUtils.execute(updateSql, [roic, currentProfit, initialCapital, stockCode, roics[i].report_date]);
-                console.log(new Date().toLocaleString(), `已成功更新${stockCode} ${roics[i].report_date}的 ${roics[i].report_date} ROIC数据: ${roic}`);
+                console.log(new Date().toLocaleString(), `已成功更新${stockCode}-${stockInfo.stock_name} ${roics[i].report_date}的 ${roics[i].report_date} ROIC数据: ${roic}`);
             }
 
         }

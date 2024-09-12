@@ -17,6 +17,8 @@ CREATE TABLE `msci_stock`.`stock` (
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- 添加stock_code索引
+ALTER TABLE `msci_stock`.`stock` ADD INDEX `stock_code` (`stock_code`);
 
 -- ROIC计算表 roic_calculation
 CREATE TABLE `msci_stock`.`roic_calculation` (
@@ -37,6 +39,7 @@ CREATE TABLE `msci_stock`.`roic_calculation` (
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+-- 添加stock_code索引
+ALTER TABLE `msci_stock`.`roic_calculation` ADD INDEX `stock_code` (`stock_code`);
 
 select * from msci_stock.stock where median_roic > 0;

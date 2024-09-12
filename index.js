@@ -34,12 +34,12 @@ const init = async () => {
     /**
      * 计算股票ROIC数据, 报告期数据有更新时，必须执行一次
      */
-    await StockUtils.calculateStockROIC();
+    // await StockUtils.calculateStockROIC();
     
     /**
      * 分析MSCI股票ROIC数据
      */
-    // await StockUtils.analyzeStockROIC();
+    await StockUtils.analyzeStockROIC();
 
     /**
      * 导出MSCI股票ROIC数据

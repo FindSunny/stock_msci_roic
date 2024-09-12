@@ -132,15 +132,16 @@ const StockUtils = {
             const stockCode = stockInfo.stock_code;
 
             // 查询指定股票code的ROIC数据
-            const querySql = 'SELECT stock_code, stock_name, CAST((roic * 10000) AS decimal(10,0)) as roic FROM roic_calculation where stock_code = ?';
+            const querySql = 'SELECT stock_code, stock_name, CAST((roic * 10000) AS decimal(10,0)) as roic FROM roic_calculation where stock_code = ? AND start_total_invested_capital != 0';
             const queryResult = await SQLUtils.execute(querySql, [stockCode]);
             if (queryResult.length == 0) {
+                console.log(new Date().toLocaleString(), `无${stockCode}-${stockInfo.stock_name}的ROIC数据`);
                 continue;
             }
             // 计算中位数
             const median = StockUtils.calculateMedian(queryResult) / 10000;
             // 计算方差
-            const variance = StockUtils.calculateVariance(queryResult) / 10000;
+            const variance = StockUtils.calculateVariance(queryResult) / (10000 * 10000);
 
             //更新股票表中的数据
             const updateSql = 'UPDATE stock SET median_roic = ?, var_roic = ?, report_count = ? WHERE stock_code = ?';

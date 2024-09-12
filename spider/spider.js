@@ -24,17 +24,18 @@ const main = async () => {
     // 2024-1 OK
     // 2023-4 OK
     // 2023-3 OK
-    // 2023-2 ING
+    // 2023-2 OK
+    // 2023-1 ING
     // 指定年份及季度
     // let year = 2024;
-    let year = 2023;
-    // let year = 2022;
+    // let year = 2023;
+    let year = 2022;
     // let year = 2021;
     // let year = 2020;
     // let year = 2019;
-    // let season = 4;
+    let season = 4;
     // let season = 3;
-    let season = 2;
+    // let season = 2;
     // let season = 1;
     // for (let i = 1; i <= 4; i++) {
     // 2.获取ROIC数据

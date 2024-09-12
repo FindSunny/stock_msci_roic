@@ -39,12 +39,12 @@ const init = async () => {
     /**
      * 分析MSCI股票ROIC数据
      */
-    await StockUtils.analyzeStockROIC();
+    // await StockUtils.analyzeStockROIC();
 
     /**
      * 导出MSCI股票ROIC数据
      */
-    // await ExcelUtils.exportStockROIC(stockInfo.season);
+    await ExcelUtils.exportStockROIC();
 
     console.log("执行完成！");
 

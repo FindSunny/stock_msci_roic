@@ -43,3 +43,6 @@ CREATE TABLE `msci_stock`.`roic_calculation` (
 ALTER TABLE `msci_stock`.`roic_calculation` ADD INDEX `stock_code` (`stock_code`);
 
 select * from msci_stock.stock where median_roic > 0;
+
+-- 查询报告期获取数量
+SELECT report_date, COUNT(1) FROM roic_calculation GROUP BY report_date;

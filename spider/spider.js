@@ -25,18 +25,29 @@ const main = async () => {
     // 2023-4 OK
     // 2023-3 OK
     // 2023-2 OK
-    // 2023-1 ING
+    // 2023-1 OK
+    // 2022-4 OK
+    // 2022-3 OK
+    // 2022-2 OK
+    // 2022-1 OK
+    // 2021-4 OK
+    // 2021-3 OK
+    // 2021-2 OK
+    // 2021-1 OK
+    // 2020-4 OK
+    // 2020-3 OK
+    // 2020-2 ING
     // 指定年份及季度
     // let year = 2024;
     // let year = 2023;
-    let year = 2022;
+    // let year = 2022;
     // let year = 2021;
-    // let year = 2020;
+    let year = 2020;
     // let year = 2019;
-    let season = 4;
+    // let season = 4;
     // let season = 3;
     // let season = 2;
-    // let season = 1;
+    let season = 1;
     // for (let i = 1; i <= 4; i++) {
     // 2.获取ROIC数据
     await getROICList(page, year, season);
@@ -99,7 +110,7 @@ const getROICList = async (page, year, seanon) => {
         ]);
         // 获取数据
         const responseBody = await responseItem.json();
-        // 第一页数据
+        // 当前页数据
         let otherPageList = responseBody.answer.components[0].data.datas;
         // 加入列表
         bondsList = bondsList.concat(otherPageList);
@@ -109,7 +120,7 @@ const getROICList = async (page, year, seanon) => {
         await new Promise((resolve) => {
             setTimeout(() => {
                 resolve();
-            }, 2000);
+            }, 2500);
         });
     }
 

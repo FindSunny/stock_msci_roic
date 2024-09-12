@@ -55,7 +55,7 @@ const StockUtils = {
         let queryStock = `SELECT * FROM stock;`
         const stocks = await SQLUtils.execute(queryStock);
         if (stocks.length == 0) {
-            console.log("无股票数据");
+            console.log(new Date().toLocaleString(), "无股票数据");
             return;
         }
 
@@ -66,7 +66,7 @@ const StockUtils = {
             let querySql = `SELECT * FROM roic_calculation WHERE stock_code = ? ORDER BY report_date DESC;`;
             let roics = await SQLUtils.execute(querySql, [stockCode]);
             if (roics.length == 0 || roics.length == 1) {
-                console.log(`无${stockCode}的ROIC数据`);
+                console.log(new Date().toLocaleString(), `无${stockCode}的ROIC数据`);
                 continue;
             }
             // 更新净利润及资产等数据，最后一条数据为初始化数据，不需要更新
@@ -77,6 +77,14 @@ const StockUtils = {
                 let currentQuarter = roics[i].report_date.substring(5, 6);
                 // 若当前季度是第一季度，则上季度为去年第四季度
                 let lastQuarter = currentQuarter == 1 ? 4 : currentQuarter - 1;
+                let lastYear = currentQuarter == 1 ? currentYear - 1 : currentYear;
+
+                // 校验下一条是否上季度数据
+                let lastQuarterDate = `${lastYear}-${lastQuarter}`;
+                if (roics[i + 1].report_date != lastQuarterDate) {
+                    console.log(new Date().toLocaleString(), `数据异常，${stockCode}-${stockInfo.stock_name} ${roics[i].report_date}的上季度数据不存在`);
+                    continue;
+                }
 
                 // 仅年度出现变化时，更新当期净利润
                 let currentProfit = roics[i].net_profit;
@@ -86,7 +94,7 @@ const StockUtils = {
                 }
                 // 期初全部投入资本 = 上季度全部投入资本
                 let initialCapital = roics[i + 1].end_total_invested_capital;
-            
+
                 // 计算ROIC = 本期净利润 * 2 / (期初全部投入资本 + 本期全部投入资本)
                 let roic = (currentProfit * 2) / (initialCapital + roics[i].end_total_invested_capital);
                 // 保留两位小数

@@ -36,18 +36,21 @@ const main = async () => {
     // 2021-1 OK
     // 2020-4 OK
     // 2020-3 OK
-    // 2020-2 ING
+    // 2020-2 OK
+    // 2020-1 OK
+    // 2019-4 OK
+    // 2019-3 OK
     // 指定年份及季度
     // let year = 2024;
     // let year = 2023;
     // let year = 2022;
     // let year = 2021;
-    let year = 2020;
-    // let year = 2019;
+    // let year = 2020;
+    let year = 2019;
     // let season = 4;
-    // let season = 3;
+    let season = 3;
     // let season = 2;
-    let season = 1;
+    // let season = 1;
     // for (let i = 1; i <= 4; i++) {
     // 2.获取ROIC数据
     await getROICList(page, year, season);

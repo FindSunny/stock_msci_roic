@@ -81,7 +81,7 @@ const ExcelUtils = {
 
         console.log('导出MSCI China Index股票ROIC数据中...');
         // 查询全部数据
-        let queryStock = `SELECT * FROM stock WHERE var_roic != 0 AND report_count >= 15;`
+        let queryStock = `SELECT * FROM stock WHERE var_roic != 0 AND report_count >= 12;`
         const stocks = await SQLUtils.execute(queryStock);
         if (stocks.length == 0) {
             console.log(new Date().toLocaleString(), "无股票数据");
@@ -101,7 +101,7 @@ const ExcelUtils = {
         XLXS.utils.book_append_sheet(workbook, ws, 'China Index ROIC');
 
         // 导出Excel文件
-        let fileName = 'China Index ROIC ' + '_' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate() + 'byQ.xlsx';
+        let fileName = 'China Index ROIC ' + '_' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate() + (new Date().getTime()) + '_byQ.xlsx';
         XLXS.writeFile(workbook, './output/' + fileName);
 
         console.log('China Index ROIC数据导出成功！');

@@ -5,6 +5,30 @@ ROIC based on MSCI index
 初代版本：本代码需要连接本地Mysql数据库进行数据计算
 最终产出ROIC excel文档。
 
+## 零，执行步骤
+
+### 1. 安装依赖
+```cmd
+npm install
+```
+
+### 2. 获取全部A股股票代码
+同花顺问财下载
+
+### 3. 获取MSCI China成分股
+> 通过东方财富网站获取 [东方财富JSON](https://63.push2.eastmoney.com/api/qt/clist/get?cb=jQuery112406205413974464327_1726127104502&pn=1&pz=2000&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&dect=1&wbp2u=|0|0|0|web&fid=f3&fs=b:BK0821+f:!50&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152,f45&_=1726127104511)
+
+### 4. 获取并插入ROIC数据
+执行 ``` ./spider/spider.js ``` 获取当季或者历史的ROIC数据
+
+### 5. 按顺序执行 ``` index.js ``` 中的代码
+> 1. 将股票列表，插入数据库
+> 2. 计算股票ROIC数据（耗时较长）
+> 3. 分析MSCI股票ROIC数据（中位数及方差）
+> 4. 输出ROIC数据到Excel
+
+
+
 ## 一, ROIC是什么？
 ROIC = NOPLAT ÷ IC （投资资本回报率 = 税后经营利润 ÷ 期初投入资本）
 

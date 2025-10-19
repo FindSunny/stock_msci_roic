@@ -14,6 +14,13 @@ const StockUtils = {
 
     insertStockList: async (stockList) => {
 
+        // 判断是否有数据
+        if (!stockList || stockList.length === 0) {
+            console.log('股票列表为空，无法插入数据');
+            return;
+        }
+        console.log('开始插入股票列表数据，数据量: ', stockList.length);
+
         // 整理股票代码列表
         const stockCodeList = [];
         for (let index = 0; index < stockList.length; index++) {
@@ -23,8 +30,8 @@ const StockUtils = {
             const querySql = 'SELECT * FROM stock where stock_code = ?';
             const queryResult = await SQLUtils.execute(querySql, [stockInfo.code]);
             if (queryResult.length > 0) {
-                console.log('数据库已有数据，不需要插入数据');
-                return;
+                // console.log('数据库已有数据，不需要插入数据: ', stockInfo.code, stockInfo.name);
+                continue;
             }
             stockCodeList.push({
                 stock_code: stockInfo.code,
@@ -38,11 +45,47 @@ const StockUtils = {
             const stock = stockCodeList[index];
             params.push([stock.stock_code, stock.stock_name, stock.industry]);
         }
+        if (params.length === 0) {
+            console.log('无新增股票数据，无需插入');
+            return;
+        }
         // 执行sql语句
         const result = await SQLUtils.execute(sql, [params]);
         // 打印日志
-        console.log('股票信息表，数据已插入: ', result.affectedRows, '条数据');
+        console.log('股票信息表，数据已插入, 新增: ', result.affectedRows, '条数据');
         return result;
+
+    },
+
+    /**
+     * 导入同花顺ROIC季度报数据
+     * @param {Array} quarterlyReportDatas 季度报数据
+     */
+    importQuarterlyReportData: async (quarterlyReportDatas) => {
+
+        if (!quarterlyReportDatas || quarterlyReportDatas.length === 0) {
+            console.log('季度报数据为空，无法导入数据');
+            return;
+        }
+
+        console.log('开始导入季度报数据，数据量: ', quarterlyReportDatas.length);
+
+        // 批量导入, 每次1000条
+        const batchSize = 1000;
+        for (let i = 0; i < quarterlyReportDatas.length; i += batchSize) {
+            const batchData = quarterlyReportDatas.slice(i, i + batchSize);
+            const sql = `INSERT INTO roic_calculation (stock_code, stock_name, report_date, roic, net_profit, end_total_invested_capital) VALUES ?`;
+            const params = [];
+            for (let index = 0; index < batchData.length; index++) {
+                const report = batchData[index];
+                params.push([report.stock_code, report.stock_name, report.report_date, report.roic, report.net_profit, report.end_total_invested_capital]);
+            }
+            // 执行sql语句
+            const result = await SQLUtils.execute(sql, [params]);
+            console.log(`已导入季度报数据: ${i} - ${i + batchData.length}, 成功插入: `, result.affectedRows, '条数据');
+        }
+
+        console.log('季度报数据导入完成');
 
     },
 
@@ -132,7 +175,7 @@ const StockUtils = {
             const stockCode = stockInfo.stock_code;
 
             // 查询指定股票code的ROIC数据
-            const querySql = 'SELECT stock_code, stock_name, CAST((roic * 10000) AS decimal(10,0)) as roic FROM roic_calculation where stock_code = ? AND start_total_invested_capital != 0';
+            const querySql = 'SELECT stock_code, stock_name, CAST((roic * 10000) AS decimal(10,0)) as roic FROM roic_calculation where stock_code = ? AND roic IS NOT NULL;';
             const queryResult = await SQLUtils.execute(querySql, [stockCode]);
             if (queryResult.length == 0) {
                 console.log(new Date().toLocaleString(), `无${stockCode}-${stockInfo.stock_name}的ROIC数据`);

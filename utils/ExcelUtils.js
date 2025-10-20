@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const XLXS = require('xlsx');
 const SQLUtils = require('./SQLUtils.js');
+const allMSCIStockCodes = require('../input/all_MSCI_stocks.json');
 
 const ExcelUtils = {
 
@@ -79,17 +80,32 @@ const ExcelUtils = {
      * 导出MSCI China Index股票ROIC数据
      * @returns
      */
-    exportStockROIC: async (seasonCount) => {
+    exportStockROIC: async ({seasonCount, isMSCI}) => {
         seasonCount = seasonCount || 12;
         console.log('导出MSCI China Index股票ROIC数据中...');
         // 查询全部数据
         let queryStock = `SELECT * FROM stock WHERE var_roic != 0 AND report_count >= ${seasonCount};`
-        const stocks = await SQLUtils.execute(queryStock);
+        let stocks = await SQLUtils.execute(queryStock);
         if (stocks.length == 0) {
             console.log(new Date().toLocaleString(), "无股票数据");
             return;
         }
+        // 过滤MSCI成分股
+        if (isMSCI) {
+            console.log('仅导出MSCI成分股数据...');
+            stocks = stocks.filter(stock => allMSCIStockCodes.findIndex(item => item.code === stock.stock_code) !== -1);
 
+            // 按照中位数降序排序，取前一半
+            stocks.sort((a, b) => b.median_roic - a.median_roic);
+            const halfLength = Math.ceil(stocks.length / 2);
+            stocks = stocks.slice(0, halfLength);
+
+            // 按照方差升序排序，取前50%
+            stocks.sort((a, b) => a.var_roic - b.var_roic);
+            const quarterLength = Math.ceil(stocks.length / 2);
+            stocks = stocks.slice(0, quarterLength);
+
+        }
         // 新建Excel文件
         let workbook = XLXS.utils.book_new();
         // 写入工作表

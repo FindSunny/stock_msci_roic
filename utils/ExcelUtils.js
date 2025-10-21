@@ -119,7 +119,7 @@ const ExcelUtils = {
         XLXS.utils.book_append_sheet(workbook, ws, 'China Index ROIC');
 
         // 导出Excel文件
-        let fileName = 'China Index ROIC ' + '_' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate() + (new Date().getTime()) + '_byQ.xlsx';
+        let fileName = 'China Index ROIC ' + '_连续' + seasonCount + '季度_' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate() + (new Date().getTime()) + '_byQ.xlsx';
         XLXS.writeFile(workbook, './output/' + fileName);
 
         console.log('China Index ROIC数据导出成功！');

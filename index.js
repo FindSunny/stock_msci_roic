@@ -39,18 +39,18 @@ const init = async () => {
     /**
      * 读取季度报数据
      */
-    // const folderPath = './input/roic/';
-    // const quarterlyReportDatas = await ExcelUtils.readQuarterlyReport(folderPath);
-    // console.log('读取季度报数据完成，数量: ', quarterlyReportDatas.length);
+    const folderPath = './input/roic/';
+    const quarterlyReportDatas = await ExcelUtils.readQuarterlyReport(folderPath);
+    console.log('读取季度报数据完成，数量: ', quarterlyReportDatas.length);
     /**
      * 导入季度报数据到数据库
      */
-    // await StockUtils.importQuarterlyReportData(quarterlyReportDatas);
+    await StockUtils.importQuarterlyReportData(quarterlyReportDatas);
     
     /*********************
      * 3. 分析ROIC数据
      * ********************/
-    // await StockUtils.analyzeStockROIC();
+    await StockUtils.analyzeStockROIC();
 
     /*********************
      * 4. 导出ROIC数据
